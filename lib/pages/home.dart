@@ -136,11 +136,11 @@ class CardContentWidget extends StatefulWidget {
 class _CardContentWidgetState extends State<CardContentWidget> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  Offset? _pointerDownPosition;
 
   @override
   void initState() {
     super.initState();
-    // Listen for page changes to update indicator
     _pageController.addListener(() {
       final page = _pageController.page?.round() ?? 0;
       if (page != _currentPage) {
@@ -157,65 +157,102 @@ class _CardContentWidgetState extends State<CardContentWidget> {
     super.dispose();
   }
 
+  void _goToNextPage(int totalPages) {
+    final nextPage = (_currentPage + 1) % totalPages;
+    _pageController.animateToPage(
+      nextPage,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _goToPreviousPage(int totalPages) {
+    final previousPage = _currentPage == 0 ? totalPages - 1 : _currentPage - 1;
+    _pageController.animateToPage(
+      previousPage,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final images = widget.userData['images'] as List<dynamic>;
     final name = widget.userData['name'] as String;
     final description = widget.userData['description'] as String;
 
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      child: Stack(
-        children: [
-          // PageView for multiple images
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12.0),
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: images.length,
-              itemBuilder: (context, index) {
-                return Image.network(
-                  images[index],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                );
-              },
-            ),
-          ),
-
-          // Bottom overlay for name + description
-          Positioned(
-            bottom: 50,
-            left: 20,
-            right: 20,
-            child: Text(
-              '$name : $description',
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-                // fontWeight: FontWeight.bold,
+    return Listener(
+      onPointerDown: (event) {
+        _pointerDownPosition = event.position;
+      },
+      onPointerUp: (event) {
+        if (_pointerDownPosition != null) {
+          final delta = (event.position - _pointerDownPosition!).distance;
+          // If the movement is small, consider it a tap
+          if (delta < 10) {
+            // Convert global position to local coordinates
+            final box = context.findRenderObject() as RenderBox;
+            final localPosition = box.globalToLocal(event.position);
+            // If tapped on the left half, scroll backwards, else forwards
+            if (localPosition.dx < box.size.width / 2) {
+              _goToPreviousPage(images.length);
+            } else {
+              _goToNextPage(images.length);
+            }
+          }
+        }
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Stack(
+          children: [
+            // PageView for multiple images (still non-scrollable)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12.0),
+              child: PageView.builder(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: images.length,
+                itemBuilder: (context, index) {
+                  return Image.network(
+                    images[index],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  );
+                },
               ),
             ),
-          ),
-
-          // Simple textual page indicator (e.g. "1/3")
-          Positioned(
-            bottom: 20,
-            left: 0,
-            right: 0,
-            child: Center(
+            // Bottom overlay for name + description
+            Positioned(
+              bottom: 50,
+              left: 20,
+              right: 20,
               child: Text(
-                '${_currentPage + 1} / ${images.length}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  shadows: [Shadow(offset: Offset(1, 1), blurRadius: 4)],
+                '$name : $description',
+                style: const TextStyle(fontSize: 20, color: Colors.white),
+              ),
+            ),
+            // Simple textual page indicator (e.g. "1/3")
+            Positioned(
+              bottom: 20,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Text(
+                  '${_currentPage + 1} / ${images.length}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    shadows: [Shadow(offset: Offset(1, 1), blurRadius: 4)],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

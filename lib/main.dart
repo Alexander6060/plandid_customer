@@ -3,32 +3,19 @@ import 'pages/jobs.dart';
 import 'pages/home.dart';
 import 'pages/notifications.dart';
 import 'pages/settings.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://owmeyuqmjxvktbszxjkz.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93bWV5dXFtanh2a3Ric3p4amt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE3NDU1MzgsImV4cCI6MjA1NzMyMTUzOH0.upjnzT6sslkBdqoHyOaeDASc88gOdPPGkEpntviMg38',
+  );
+
   runApp(MyApp());
 }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(title: const Text("Welcome to Flutter")),
-//         body: const Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//           crossAxisAlignment: CrossAxisAlignment.end,
-//           children: [
-//             Icon(Icons.backpack),
-//             Icon(Icons.percent),
-//             Icon(Icons.join_full_rounded),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
