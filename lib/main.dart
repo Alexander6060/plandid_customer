@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'jobs.dart';
-import 'home.dart';
-import 'notifications.dart';
-import 'settings.dart';
+import 'pages/jobs.dart';
+import 'pages/home.dart';
+import 'pages/notifications.dart';
+import 'pages/settings.dart';
 
 void main() {
   runApp(MyApp());
