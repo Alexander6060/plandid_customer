@@ -3,7 +3,9 @@ import 'pages/jobs.dart';
 import 'pages/home.dart';
 import 'pages/notifications.dart';
 import 'pages/settings.dart';
+// ignore: depend_on_referenced_packages
 import 'package:supabase_flutter/supabase_flutter.dart';
+import "auth/authgate.dart";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +16,7 @@ Future<void> main() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93bWV5dXFtanh2a3Ric3p4amt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE3NDU1MzgsImV4cCI6MjA1NzMyMTUzOH0.upjnzT6sslkBdqoHyOaeDASc88gOdPPGkEpntviMg38',
   );
 
-  runApp(MyApp());
+  runApp(const AuthGate());
 }
 
 class MyApp extends StatefulWidget {

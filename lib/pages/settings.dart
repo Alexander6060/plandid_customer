@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../auth/authscreen.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -15,6 +17,18 @@ class _SettingsPageState extends State<SettingsPage> {
   String _location = 'Clayton, 3168';
   bool _notificationsEnabled = true;
   bool _locationSuggestions = true;
+  final SupabaseClient _supabase = Supabase.instance.client;
+
+  Future<void> _signOut() async {
+    await _supabase.auth.signOut();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const AuthScreen()),
+        (route) => false, // Remove all previous routes
+      );
+    }
+  }
 
   Future<void> _pickWeddingDate() async {
     final now = DateTime.now();
@@ -216,7 +230,7 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ElevatedButton(
               onPressed: () {
-                // Handle logout
+                _signOut();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
